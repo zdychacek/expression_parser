@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Expression Parser</title>
+</head>
+<body>
+  <script src="app/lexer.js"></script>
+  <script src="app/parser.js"></script>
+  <script src="app/evaluator.js"></script>
+
+  <input id="source" value="x = y= cos (5 * - (9 + 6))"/>
+  <button id="do">Do</button>
+
+  <h3>AST</h3>
+  <pre id="ast"></pre>
+
+  <h3>Tokens</h3>
+  <pre id="tokens"></pre>
+
+  <script src="app/app.js"></script>
+</body>
+</html>
