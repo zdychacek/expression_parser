@@ -2,7 +2,7 @@ function Evaluator () {
 }
 
 Evaluator.prototype = {
-  evaluate: function (astExpr) {
+  evaluate: function (ast) {
 
   }
 };

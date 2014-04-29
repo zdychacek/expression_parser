@@ -9,11 +9,16 @@ Parser.prototype = {
     this._currIndex = -1;
     this._tokens = tokens;
 
-    var tree = {
-      'Expression': this.parseExpression()
-    };
+    var expr = this.parseExpression();
+    var token = this.advance();
 
-    return tree;
+    if (token) {
+      throw new SyntaxError('Unexpected token ' + token.value + '.');
+    }
+
+    return {
+      'Expression': expr
+    };
   },
 
   advance: function () {
@@ -104,7 +109,7 @@ Parser.prototype = {
 
     if (this.matchOp(token, '+') || this.matchOp(token, '-')) {
       token = this.advance();
-      expr = this.parsePrimary();
+      expr = this.parseUnary();
 
       return {
         'Unary': {
@@ -121,7 +126,7 @@ Parser.prototype = {
     var token = this.peek();
 
     if (!token) {
-      throw new SyntaxError('Unexpected end.');
+      throw new SyntaxError('Unexpected termination of expression.');
     }
 
     if (token.type == 'Number') {
@@ -136,8 +141,6 @@ Parser.prototype = {
       token = this.advance();
 
       if (this.matchOp(this.peek(), '(')) {
-        this.advance();
-
         return {
           'FunctionCall': this.parseFunctionCall(token.value)
         };
@@ -164,12 +167,15 @@ Parser.prototype = {
       }
     }
 
-    throw new SyntaxError('Parse error, can not process token ' + token.value + '.');
+    throw new SyntaxError('Parse error, can not process token \'' + token.value + '\'.');
   },
 
   parseFunctionCall: function (name) {
-    var args = [];
-    var token = this.peek();
+    var args = [], token;
+
+    this.advance();
+
+    token = this.peek();
 
     if (!this.matchOp(token, ')')) {
       while (true) {
@@ -181,12 +187,17 @@ Parser.prototype = {
           this.advance();
           continue;
         }
-
-        if (this.matchOp(token, ')')) {
+        else if (this.matchOp(token, ')')) {
           this.advance();
           break;
         }
+        else {
+          throw new SyntaxError('Expecting ) in a function call \'' + name +  '\'.');
+        }
       }
+    }
+    else {
+      this.advance();
     }
 
     return {
